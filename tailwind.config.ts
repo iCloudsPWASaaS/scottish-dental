@@ -1,0 +1,95 @@
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./src/app/**/*.{ts,tsx}",
+    "./src/components/**/*.{ts,tsx}",
+    "./src/lib/**/*.{ts,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          50: "#eef3ff",
+          100: "#dde9ff",
+          200: "#bfd4fd",
+          300: "#96b9fb",
+          400: "#7aa5f8",
+          500: "#5a8df8",
+          600: "#4a7ff8",
+          700: "#2b52b6",
+          800: "#1b3a8c",
+          900: "#152966",
+          950: "#0d1f4f",
+        },
+        clinical: {
+          50: "#f4f8f7",
+          100: "#e3efec",
+          200: "#c8dfdb",
+          300: "#a1c8c2",
+          400: "#75aaa1",
+          500: "#578d85",
+          600: "#43726c",
+          700: "#385c58",
+          800: "#304b48",
+          900: "#2a3f3d",
+        },
+        ow: {
+          brand: "#0a1ff0",
+          "brand-hover": "#0817c2",
+          "brand-active": "#061199",
+          ink: "#0b1f5c",
+          "ink-soft": "#1e2f6b",
+          line: "#e6e9f2",
+          "line-strong": "#d5dae6",
+          "bg-soft": "#f7f8fc",
+          "bg-tint": "#eef0ff",
+          "text-secondary": "#4b5563",
+          "text-muted": "#6b7280",
+          "chart-muted": "#c9d7f8",
+          "ui-blue": "#2563eb",
+          "warning-bg": "#fef3c7",
+          "warning-text": "#b45309",
+          "success-bg": "#dcfce7",
+          "success-text": "#166534",
+          "danger-bg": "#fee2e2",
+          "danger-text": "#b91c1c",
+        },
+      },
+      borderRadius: {
+        "ow-xs": "4px",
+        "ow-sm": "6px",
+        "ow-md": "8px",
+        "ow-lg": "12px",
+        "ow-xl": "16px",
+      },
+      boxShadow: {
+        card: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+        "card-hover": "0 4px 12px rgba(0,0,0,0.12)",
+        pill: "0 4px 14px rgba(74,127,248,0.25)",
+      },
+      fontFamily: {
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        display: [
+          "var(--font-plus-jakarta)",
+          "Plus Jakarta Sans",
+          "Helvetica Neue",
+          "Helvetica",
+          "Arial",
+          "sans-serif",
+        ],
+        ow: [
+          "var(--font-plus-jakarta)",
+          "Plus Jakarta Sans",
+          "Helvetica Neue",
+          "Helvetica",
+          "Arial",
+          "sans-serif",
+        ],
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;
