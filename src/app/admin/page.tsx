@@ -33,6 +33,13 @@ export default async function AdminPage() {
         )}
         {isAdmin && (
           <>
+            <Link href="/admin/clinics" className="card transition hover:border-brand-300">
+              <h2 className="font-semibold text-slate-900">Clinic registrations</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                All registered clinics with portal credentials, approvals and
+                password management.
+              </p>
+            </Link>
             <Link href="/admin/locations" className="card transition hover:border-brand-300">
               <h2 className="font-semibold text-slate-900">Listings &amp; approvals</h2>
               <p className="mt-1 text-sm text-slate-600">

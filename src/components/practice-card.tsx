@@ -9,6 +9,7 @@ interface Props {
   acceptingNewNhs?: boolean;
   treatments?: string[];
   distance?: string;
+  rating?: number;
 }
 
 const statusLabel: Record<NhsPrivate, { text: string; className: string }> = {
@@ -29,6 +30,7 @@ export function PracticeCard({
   acceptingNewNhs,
   treatments = [],
   distance,
+  rating,
 }: Props) {
   const status = statusLabel[nhsPrivate] ?? statusLabel.unverified;
 
@@ -45,9 +47,23 @@ export function PracticeCard({
 
       <p className="text-sm text-slate-600">{address}</p>
 
-      {distance && (
-        <p className="text-xs font-medium text-slate-500">{distance} away</p>
-      )}
+      <div className="flex items-center gap-3 text-xs text-slate-500">
+        {rating !== undefined && (
+          <span className="inline-flex items-center gap-1 font-medium text-emerald-700">
+            <svg
+              aria-hidden
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.5l7.1-.6L12 2z" />
+            </svg>
+            {rating.toFixed(1)}
+          </span>
+        )}
+        {distance && <span className="font-medium">{distance} away</span>}
+      </div>
 
       <div className="flex flex-wrap gap-1.5">
         {acceptingNewNhs && (

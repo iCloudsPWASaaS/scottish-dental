@@ -29,20 +29,28 @@ export default async function SearchPage({ searchParams }: Props) {
   let query = supabase
     .from("practice_locations")
     .select(
-      "id, name, slug, address, postcode, local_authority, nhs_board, nhs_private, accepting_new_nhs, latitude, longitude"
+      "id, name, slug, address, postcode, town, local_authority, nhs_board, nhs_private, accepting_new_nhs, latitude, longitude, rating"
     )
     .eq("status", "published");
 
   if (params.q) {
     query = query.or(
-      `name.ilike.%${params.q}%,address.ilike.%${params.q}%,local_authority.ilike.%${params.q}%`
+      `name.ilike.%${params.q}%,address.ilike.%${params.q}%,local_authority.ilike.%${params.q}%,town.ilike.%${params.q}%`
     );
   }
 
   if (params.postcode) {
     const normalised = normalisePostcode(params.postcode);
-    const outward = normalised.replace(/[0-9][A-Z]{2}$/, "");
-    query = query.ilike("postcode", `${outward}%`);
+    // Full postcode (G1 1AA -> G11AA) or outward code (G1) -> prefix-match the
+    // postcode column. Anything else (a town or free text) -> match by town.
+    const outward = normalised.match(/^([A-Z]{1,2}[0-9][0-9A-Z]?)([0-9][A-Z]{2})?$/);
+    if (outward) {
+      query = query.ilike("postcode", `${outward[1]}%`);
+    } else {
+      query = query.or(
+        `town.ilike.%${params.postcode}%,name.ilike.%${params.postcode}%,address.ilike.%${params.postcode}%,local_authority.ilike.%${params.postcode}%`
+      );
+    }
   }
 
   if (params.nhs) {
@@ -130,9 +138,10 @@ export default async function SearchPage({ searchParams }: Props) {
               key={p.id}
               slug={p.slug}
               name={p.name}
-              address={`${p.address}, ${p.postcode}`}
+              address={`${p.address}, ${p.town ? `${p.town}, ` : ""}${p.postcode}`}
               nhsPrivate={p.nhs_private}
               acceptingNewNhs={p.accepting_new_nhs}
+              rating={p.rating ?? undefined}
             />
           ))}
         </div>

@@ -1,0 +1,7 @@
+there should be a super admin area where he can see all clinic registration. for example each clinic should have portal as exaple inlaysoft@yahoo.com/Moon007!786! is a example for login for one portal. so for each clinic data should have credetials and managable from superadmin area. and on fron end clickc should be filter by postcode/towbname - just follow https://www.openwide.clinic/ for this.
+
+---------------------------------------------------
+
+Two things to confirm before I execute:
+1. Super-admin login admin@scottishdental.com / SuperAdmin!2026 — OK, or give me your preferred email/password?
+2. All 20 portal clinics share password Moon007!786! — OK, or want a different one?

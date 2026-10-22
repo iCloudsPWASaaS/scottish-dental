@@ -3,6 +3,7 @@ import Link from "next/link";
 import { FaqAccordion } from "@/components/faq-accordion";
 import { Reveal } from "@/components/reveal";
 import { SearchBar } from "@/components/search-bar";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const HERO_CHIPS = [
   { label: "Find a dentist", href: "/search" },
@@ -16,7 +17,7 @@ const STATS = [
   { figure: "Free", label: "Search, compare and enquire as a patient — always free." },
 ];
 
-const FEATURED = [
+const FEATURED_FALLBACK = [
   { name: "Example Glasgow Dental", city: "Glasgow", img: "/images/clinic-1.jpg" },
   { name: "Example Edinburgh Dental", city: "Edinburgh", img: "/images/clinic-2.jpg" },
   { name: "Example Aberdeen Dental", city: "Aberdeen", img: "/images/clinic-3.jpg" },
@@ -81,7 +82,7 @@ const TREATMENTS = [
   },
 ];
 
-const CITIES = [
+const CITIES_FALLBACK = [
   "Glasgow",
   "Edinburgh",
   "Aberdeen",
@@ -121,8 +122,31 @@ const FAQS = [
   },
 ];
 
-export default function HomePage() {
-  return (
+export default async function HomePage() {
+  const supabase = await createSupabaseServerClient();
+
+  const { data: published } = await supabase
+    .from("practice_locations")
+    .select("name, slug, town, image_url, rating")
+    .eq("status", "published")
+    .order("rating", { ascending: false })
+    .limit(12);
+
+  const featured =
+    published && published.length > 0
+      ? published.map((p) => ({
+          name: p.name,
+          city: p.town ?? "",
+          img: p.image_url || "/images/clinic-1.jpg",
+          slug: p.slug,
+        }))
+      : FEATURED_FALLBACK;
+
+  const towns = published
+    ? Array.from(new Set(published.map((p) => p.town).filter(Boolean) as string[])).slice(0, 10)
+    : [];
+  const cities = towns.length >= 4 ? towns : CITIES_FALLBACK;
+return (
     <>
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="hero-bowl relative overflow-hidden bg-[#f0f5ff]">
@@ -234,45 +258,54 @@ export default function HomePage() {
           />
 
           <div className="flex w-max animate-scroll-x gap-4">
-            {[...FEATURED, ...FEATURED].map((practice, i) => (
-              <div
-                key={`${practice.name}-${i}`}
-                aria-hidden={i >= FEATURED.length}
-                className="w-[260px] shrink-0 rounded-xl border border-[#d0dff8] bg-white p-3 shadow-card transition hover:shadow-card-hover"
-              >
-                <div className="relative h-32 overflow-hidden rounded-lg bg-slate-100">
-                  <Image
-                    src={practice.img}
-                    alt=""
-                    fill
-                    sizes="260px"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="flex items-start justify-between gap-2 px-1 pb-1 pt-3">
-                  <div>
-                    <p className="text-sm font-semibold text-brand-950">
-                      {practice.name}
-                    </p>
-                    <p className="text-xs text-slate-500">{practice.city}</p>
+            {[...featured, ...featured].map((practice, i) => {
+              const card = (
+                <div
+                  key={`${practice.name}-${i}`}
+                  aria-hidden={i >= featured.length}
+                  className="w-[260px] shrink-0 rounded-xl border border-[#d0dff8] bg-white p-3 shadow-card transition hover:shadow-card-hover"
+                >
+                  <div className="relative h-32 overflow-hidden rounded-lg bg-slate-100">
+                    <Image
+                      src={practice.img}
+                      alt=""
+                      fill
+                      sizes="260px"
+                      className="object-cover"
+                    />
                   </div>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700">
-                    <svg
-                      aria-hidden
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                    >
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    </svg>
-                    Verified
-                  </span>
+                  <div className="flex items-start justify-between gap-2 px-1 pb-1 pt-3">
+                    <div>
+                      <p className="text-sm font-semibold text-brand-950">
+                        {practice.name}
+                      </p>
+                      <p className="text-xs text-slate-500">{practice.city}</p>
+                    </div>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700">
+                      <svg
+                        aria-hidden
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                      >
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                      </svg>
+                      Verified
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+              return "slug" in practice && practice.slug ? (
+                <Link key={`${practice.name}-${i}`} href={`/practices/${practice.slug}`}>
+                  {card}
+                </Link>
+              ) : (
+                card
+              );
+            })}
           </div>
         </div>
       </section>
@@ -403,7 +436,7 @@ export default function HomePage() {
           </div>
 
           <div className="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
-            {CITIES.map((city) => (
+            {cities.map((city) => (
               <Link
                 key={city}
                 href={`/search?postcode=${encodeURIComponent(city)}`}
